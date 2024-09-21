@@ -1,17 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
-import { FlatList, StyleSheet, View,Text, TextInput, TouchableOpacity } from 'react-native';
-import { Produto } from './src/components/Produto';
+import { useEffect, useState } from 'react';
+import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import { InputAddProduto } from './src/components/InputAddProduto';
-import { useState, useEffect } from 'react';
-import { Feather } from '@expo/vector-icons';
-import {InputContainer, Input, InputButton} from './src/components/InputAddProduto/styles';
-import { Alert } from 'react-native'; 
+import { Produto } from './src/components/Produto';
+import { CardNumber } from './src/components/CardNumber';
 
 export default function App() {
 
   const [produtos, setProdutos] = useState<{description: string; check: boolean}[]>([]);
   const [produtoText, setProdutoText] = useState("");
   const [countProduto, setCountProduto] = useState(0);
+  const [countProdutoCheck, setCountProdutoCheck] = useState(0);
 
   function handleProdutoAdd() {
     if(produtoText == "") {
@@ -35,6 +34,12 @@ export default function App() {
       description: produtoToChange.description,
       check: !produtoToChange.check,
     }
+    if (newProduto.check) {
+      setCountProdutoCheck(countProdutoCheck + 1);
+    }
+    else {
+      setCountProdutoCheck(countProdutoCheck - 1);
+    }
     updatedProdutos.push(newProduto);
     setProdutos(updatedProdutos);
   }
@@ -44,6 +49,9 @@ export default function App() {
       [
         {text: "Sim",
           onPress: () => {
+            if (produtoToDelete.check) {
+              setCountProdutoCheck(countProdutoCheck - 1);
+            }
             const updatedProdutos = produtos.filter((produto) => produto !== produtoToDelete)
             setProdutos(updatedProdutos);
           }
@@ -65,7 +73,12 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <InputAddProduto onPress={handleProdutoAdd} onChangeText={setProdutoText} value={produtoText}/>
-    
+
+      <View style={{flexDirection: 'row', gap: 16}}>
+      <CardNumber title={"Na lista"} num={countProduto} color={"#1e1e1e"}/>
+        <CardNumber title={"Marcadas"} num={countProdutoCheck} color={"#E8BA1A"}/>
+        <CardNumber title={"Não marcadas"} num={countProduto-countProdutoCheck} color={"#0E9577"}/>
+      </View>
       <View style={styles.produtos}>
         <Text>Tarefas: {countProduto}</Text>
 
