@@ -3,13 +3,15 @@ import {Feather} from "@expo/vector-icons";
 import { RootStackParamList } from "@/utils/types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import { useContext } from "react";
+import { ProdutoContext } from "@/context/ProdutoContext";
 
 type Props = NativeStackScreenProps<RootStackParamList>; 
 
 
-export default function Details({route}: any) {
+export default function Details() {
 
-    const{id, title, status} = route.params;
+    const {produto} = useContext(ProdutoContext);
 
     const navigation = useNavigation<Props['navigation']>();
 
@@ -22,17 +24,17 @@ export default function Details({route}: any) {
                 </TopButton>
             </TopContainer>
             <TitleContainer>
-                <Title>{title}</Title>
+                <Title>{produto.title}</Title>
             </TitleContainer>
             <TextStatus>Status do produto:</TextStatus>
             <StatusContainer>
                 <StatusCard>
-                    <StatusIcon style={status? {backgroundColor: "#0e9577"}: {}}>
-                        {!status && <Feather name="square" size={24} color="white" />}
-                        {status && <Feather name="check-square" size={24} color="white" />}
+                    <StatusIcon style={produto.status? {backgroundColor: "#0e9577"}: {}}>
+                        {!produto.status && <Feather name="square" size={24} color="white" />}
+                        {produto.status && <Feather name="check-square" size={24} color="white" />}
                     </StatusIcon>
                     <StatusTextContainer>
-                        <StatusText>{status ? "Marcado": "Não marcado"}</StatusText>
+                        <StatusText>{produto.status ? "Marcado": "Não marcado"}</StatusText>
                     </StatusTextContainer>
                 </StatusCard>
                 <StatusButtonDel>
