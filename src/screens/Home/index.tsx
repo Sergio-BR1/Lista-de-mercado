@@ -3,10 +3,13 @@ import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import { InputAddProduto } from '../../components/InputAddProduto';
 import { Produto } from '../../components/Produto';
 import { CardNumber } from '../../components/CardNumber';
+import { useContext } from 'react';
+import { ProdutoContext } from '@/context/ProdutoContext';
+import { ProdutoProps } from '@/utils/types';
 
 export default function Home() {
 
-  const [produtos, setProdutos] = useState<{description: string; check: boolean}[]>([]);
+  const {produtos, createProduto, setProdutos} = useContext(ProdutoContext);
   const [produtoText, setProdutoText] = useState("");
   const [countProduto, setCountProduto] = useState(0);
   const [countProdutoCheck, setCountProdutoCheck] = useState(0);
@@ -17,23 +20,23 @@ export default function Home() {
       return Alert.alert("Erro", "Produto está sem descrição.");
     }
 
-    if(produtos.some((produto)=> produto.description === produtoText)) {
+    if(produtos.some((produto)=> produto.title === produtoText)) {
       console.log('Produto já existe!');
       return Alert.alert("Erro", "Produto já existe!");
     }
 
-    const newProduto = {description: produtoText, check: false};
-    setProdutos([...produtos, newProduto]);
+    createProduto(produtoText);
     setProdutoText('');
   }
 
-  function handleProdutoChangeStatus(produtoToChange: {description: string;  check: boolean}) {
-    const updatedProdutos = produtos.filter((produto)=> produto.description !== produtoToChange.description);
+  function handleProdutoChangeStatus(produtoToChange: ProdutoProps) {
+    const updatedProdutos = produtos.filter((produto)=> produto.title !== produtoToChange.title);
     const newProduto =  {
-      description: produtoToChange.description,
-      check: !produtoToChange.check,
+      id: produtoToChange.id,
+      title: produtoToChange.title,
+      status: !produtoToChange.status,
     }
-    if (newProduto.check) {
+    if (newProduto.status) {
       setCountProdutoCheck(countProdutoCheck + 1);
     }
     else {
@@ -43,15 +46,15 @@ export default function Home() {
     setProdutos(updatedProdutos);
   }
 
-  function handleProdutoDelete (produtoToDelete: {description: string; check: boolean;}) {
-    Alert.alert("Atenção!", `Deseja realmente removar o produto? ${produtoToDelete.description}`,
+  function handleProdutoDelete (produtoToDelete: ProdutoProps) {
+    Alert.alert("Atenção!", `Deseja realmente removar o produto? ${produtoToDelete.title}`,
       [
         {text: "Sim",
           onPress: () => {
-            if (produtoToDelete.check) {
+            if (produtoToDelete.status) {
               setCountProdutoCheck(countProdutoCheck - 1);
             }
-            const updatedProdutos = produtos.filter((produto) => produto !== produtoToDelete)
+            const updatedProdutos = produtos.filter((produto) => produto.title !== produtoToDelete.title)
             setProdutos(updatedProdutos);
           }
 
@@ -86,9 +89,10 @@ export default function Home() {
           keyExtractor={(item, index) => index.toString()}
           renderItem={
             ({item}) => (
-              <Produto 
-                title={item.description}
-                status={item.check}
+              <Produto
+                id={item.id} 
+                title={item.title}
+                status={item.status}
                 onCheck={()=>handleProdutoChangeStatus(item)}
                 onRemove={()=>handleProdutoDelete(item)}
 

@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ProdutoContext } from '@/context/ProdutoContext';
 
 
+
 type Props = NativeStackScreenProps<RootStackParamList>;
 
 export function Produto(props: ProdutoProps) {
@@ -15,7 +16,7 @@ export function Produto(props: ProdutoProps) {
     const {selectProduto} = useContext(ProdutoContext);
 
     function handlePress() {
-        navigation.navigate('Details');
+        navigation.navigate("Details");
         selectProduto(props);
     }
 
